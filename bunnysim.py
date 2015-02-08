@@ -1,10 +1,13 @@
 import random
 name_list = []
+colors = []
 with open("names_male.txt", "r") as f:
 	for line in f:
 		name_list.append(line.strip()) #Adds each name into list, and strips of /n's
 
-colors = ["Black", "White", "Green", "Red", "Purple"]
+with open("colorlist.txt", "r") as f:
+	for line in f:
+		colors.append(line.strip())
 
 class Bunny(object):
 	
@@ -34,7 +37,7 @@ class Food(object):
 		self.value = value
 
 def displayStats(self):
-	print 'Name: {0:10}\tSex: {1}\tAge: {2}\tColor: {3}\tWeight: {4}'.format(self.name, self.sex,self.age,self.color,self.weight)
+	print '{0:10}\t{1}\t{2}\t{3}\t{4}'.format(self.name, self.sex,self.age,self.color,self.weight)
 
 carrot = Food('Carrot', 1)
 
