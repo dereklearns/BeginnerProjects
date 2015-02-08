@@ -1,27 +1,26 @@
 import random
+
 male_names = []
 female_names = []
 colors = []
 
-with open("names_male.txt", "r") as f:
-	for line in f:
-		male_names.append(line.strip()) #Adds each name into list, and strips of /n's
+def loadfile(filename, listname):
+	with open(filename, "r") as f:
+		for line in f:
+			listname.append(line.strip())
 
-with open("names_female.txt", "r") as f:
-	for line in f:
-		female_names.append(line.strip())
-
-with open("colorlist.txt", "r") as f:
-	for line in f:
-		colors.append(line.strip())
+loadfile("names_male.txt", male_names)
+loadfile("names_female.txt", female_names)
+loadfile("colorlist.txt", colors)
 
 class Bunny(object):
 	
-	age = -1
-	weight = -1
+	age = 0
+	weight = 5
 	color = "-1"
 	name = "-1"
 	sex = "-1"
+	pregnant = False
 
 	def __init__(self):
 		self.color = random.choice(colors)
@@ -37,8 +36,10 @@ class Bunny(object):
 		#print self.name, " eats ", food.name
 		self.weight += food.value
 
-	def deathcheck(self):
-		if self.age > 10:
+	def isdead(self):
+		if self.age > 50:
+			return True
+		elif self.weight <= 0:
 			return True
 		else:
 			return False
@@ -63,23 +64,43 @@ current_Day = 0
 
 for i in range(5):
 	bunnies.append(Bunny())
-for bunny in bunnies:
-	bunny.age = random.randrange(1,10)
 
-i = 0
-while i < 15:
-	
+
+
+def able_to_breed(bunny):
+	if bunny.sex == "F" and bunny.pregnant == False:
+		return True
+	else:
+		return False
+
+def make_bunnies():
+	for i in range(6):
+		bunnies2.append(Bunny())
+
+while len(bunnies):
+	bunnies = sorted(bunnies, key = lambda bunny: bunny.name)
+	current_Day += 1
+
 	for bunny in bunnies:
+		bunny.weight += random.choice([-2,-1,1,2])
 		bunny.age += 1
-		if bunny.age < 15:
+
+		if able_to_breed(bunny):
+			if random.choice([1,2,3,4,5]) == 3:
+				make_bunnies()
+
+		if  not bunny.isdead():
 			bunnies2.append(bunny)
 		else:
 			pass
+
 		displayStats(bunny)
 
 	del bunnies
 	bunnies = bunnies2
 	del bunnies2
 	bunnies2 = []
-	i += 1
 	print "*" *72
+	raw_input()
+
+print "The bunnies lasted ", current_Day, " days."
