@@ -1,87 +1,73 @@
 import random
-
-male_names = []
-female_names = []
-colors = []
-
-def loadfile(filename, listname):
-	with open(filename, "r") as f:
-		for line in f:
-			listname.append(line.strip())
-
-loadfile("names_male.txt", male_names)
-loadfile("names_female.txt", female_names)
-loadfile("colorlist.txt", colors)
-
+ 
+def loadfile(filename):
+    with open(filename, "r") as open_file:
+        return [line.strip() for line in open_file]
+ 
 class Bunny(object):
-	
-	age = 0
-	color = "-1"
-	name = "-1"
-	sex = "-1"
-
 	def __init__(self):
+		self.age = 0
+		self.sex = random.choice(("M", "F"))
+		self.name = random.choice(male_names if self.sex == "M" else female_names)
+		self.radioactive = random.randrange(1,100) <= 2
 		self.color = random.choice(colors)
-		self.sex = random.choice(["M", "F"])
-		
-		if self.sex == "M":
-			self.name = random.choice(male_names)
-		else:
-			self.name = random.choice(female_names)		
 
 	def isdead(self):
-		if self.age > 10:
-			return True
-		else:
-			return False
+		if not self.radioactive:
+			return self.age > 10
+		return self.age > 50
 
-def displayStats(self):
-	print '{0:10}\t{1}\t{2}\t{3:20}\t'.format(self.name, self.sex,self.age,self.color)
+	def breedable(self):
+		return self.sex == "F" and self.age >= 2 and not self.radioactive
 
-bunnies = []
-bunniesupdated = []
-current_Day = 0
+	def printstats(self):
+		print "{name:10}\t{age}\t{sex}\t{color}\t{radioactive}".format(name = self.name,
+																		age = self.age,
+																		sex = self.sex,
+																		color = self.color,
+																		radioactive = "Healthy" if not self.radioactive else "Radioactive")
 
-for i in range(5):
-	bunnies.append(Bunny())
-
-def able_to_breed(bunny):
-	if bunny.sex == "F" and bunny.age >= 2:
-		return True
-	else:
-		return False
-
-def make_bunnies(mother):
+def makebaby(mother):
 	newbaby = Bunny()
 	newbaby.color = mother.color
-	bunniesupdated.append(newbaby)
+	return newbaby
 
-while len(bunnies):
-	bunnies = sorted(bunnies, key = lambda bunny: bunny.age)
-	current_Day += 1
 
-	for bunny in bunnies:
-
+def cycle(bunnies):
+	for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations
 		bunny.age += 1
+		
+		if bunny.isdead():
+			bunnies.remove(bunny)
+			continue
 
-		if able_to_breed(bunny):
-			make_bunnies(bunny)
+		if bunny.breedable():
+			male_bunnies = filter(lambda x: x.sex == "M", bunnies)
+			if male_bunnies:
+				bunnies.append(makebaby(bunny))
 
-		if  not bunny.isdead():
-			bunniesupdated.append(bunny)
-			displayStats(bunny)
-		else:
-			pass
+		if bunny.radioactive:
+			normal_bunnies = list(filter(lambda x: not x.radioactive, bunnies))
+			if normal_bunnies:
+				unlucky_bunny = random.choice(normal_bunnies)
+				bunnies[bunnies.index(unlucky_bunny)].radioactive = True
 
-	del bunnies
-	bunnies = bunniesupdated
-	del bunniesupdated
-	bunniesupdated = []
-	print "*" *72
-	
-	if len(bunnies) > 10:
-		random.shuffle(bunnies)
-		del bunnies[len(bunnies)//2:] #Deletes list from half to end
+		bunny.printstats()
 
 
-print "The bunnies lasted ", current_Day, " days."
+def main():
+	bunnies = []
+	for i in range(5):
+		bunnies.append(Bunny())
+
+	while bunnies:
+		cycle(bunnies)
+		if len(bunnies) > 1000:
+			random.shuffle(bunnies)
+			bunnies = bunnies[:len(bunnies) // 2]
+
+if __name__ == '__main__':
+    male_names = loadfile("names_male.txt")
+    female_names = loadfile("names_female.txt")
+    colors = loadfile("colorlist.txt")
+    main()
