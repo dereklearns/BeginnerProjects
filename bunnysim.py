@@ -20,8 +20,8 @@ class Bunny(object):
 	def breedable(self):
 		return self.sex == "F" and self.age >= 2 and not self.radioactive
 
-	def printstats(self):
-		print "{name:10}\t{age}\t{sex}\t{color}\t{radioactive}".format(name = self.name,
+	def getstats(self):
+		return "{name:10}\t{age}\t{sex}\t{color}\t{radioactive}".format(name = self.name,
 																		age = self.age,
 																		sex = self.sex,
 																		color = self.color,
@@ -34,25 +34,28 @@ def makebaby(mother):
 
 
 def cycle(bunnies):
-	for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations
-		bunny.age += 1
-		
-		if bunny.isdead():
-			bunnies.remove(bunny)
-			continue
+	with open("bunnyinfo.txt", "a") as f: #using "a", doesn't overwrite but adds new write statements
+		for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations
+			bunny.age += 1
+			
+			if bunny.isdead():
+				bunnies.remove(bunny)
+				continue
 
-		if bunny.breedable():
-			male_bunnies = filter(lambda x: x.sex == "M", bunnies)
-			if male_bunnies:
-				bunnies.append(makebaby(bunny))
+			if bunny.breedable():
+				male_bunnies = filter(lambda x: x.sex == "M", bunnies)
+				if male_bunnies:
+					bunnies.append(makebaby(bunny))
 
-		if bunny.radioactive:
-			normal_bunnies = list(filter(lambda x: not x.radioactive, bunnies))
-			if normal_bunnies:
-				unlucky_bunny = random.choice(normal_bunnies)
-				bunnies[bunnies.index(unlucky_bunny)].radioactive = True
+			if bunny.radioactive:
+				normal_bunnies = list(filter(lambda x: not x.radioactive, bunnies))
+				if normal_bunnies:
+					unlucky_bunny = random.choice(normal_bunnies)
+					bunnies[bunnies.index(unlucky_bunny)].radioactive = True
 
-		bunny.printstats()
+			print bunny.getstats()
+			
+			f.write(str(bunny.getstats())  + "\n")
 
 
 def main():
