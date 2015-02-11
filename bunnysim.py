@@ -21,7 +21,7 @@ class Bunny(object):
 		return self.sex == "F" and self.age >= 2 and not self.radioactive
 
 	def getstats(self):
-		return "{name:10}\t{age}\t{sex}\t{color}\t{radioactive}".format(name = self.name,
+		return "{name:10}\t{age}\t{sex}\t{color:20}\t{radioactive}".format(name = self.name,
 																		age = self.age,
 																		sex = self.sex,
 																		color = self.color,
@@ -34,7 +34,7 @@ def makebaby(mother):
 
 
 def cycle(bunnies):
-	with open("bunnyinfo.txt", "a") as f: #using "a", doesn't overwrite but adds new write statements
+	with open("bunnyinfo.txt", "a") as f:
 		for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations
 			bunny.age += 1
 			
@@ -54,8 +54,9 @@ def cycle(bunnies):
 					bunnies[bunnies.index(unlucky_bunny)].radioactive = True
 
 			print bunny.getstats()
-			
-			f.write(str(bunny.getstats())  + "\n")
+
+		for bunny in bunnies:
+			f.write(str(bunny.getstats()) + "\n")
 
 
 def main():
@@ -63,6 +64,9 @@ def main():
 	for i in range(5):
 		bunnies.append(Bunny())
 
+	with open("bunnyinfo.txt", "w") as f:
+		f.write("")
+		f.close()
 	while bunnies:
 		cycle(bunnies)
 		if len(bunnies) > 1000:
