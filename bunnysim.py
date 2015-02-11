@@ -32,7 +32,6 @@ def makebaby(mother):
 	newbaby.color = mother.color
 	return newbaby
 
-
 def cycle(bunnies):
 	with open("bunnyinfo.txt", "a") as f:
 		for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations

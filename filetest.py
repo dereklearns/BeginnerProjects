@@ -17,4 +17,4 @@ print colors
 
 with open("newcolors.txt", "w") as f:
 	for color in colors:
-		f.write(color + "\n")
+		f.write(color + "")
