@@ -13,7 +13,7 @@ class Bunny(object):
 		self.radioactive = random.randrange(1,100) <= 2
 		self.color = random.choice(colors)
 
-	def isdead(self):
+	def is_dead(self):
 		if not self.radioactive:
 			return self.age > 10
 		return self.age > 50
@@ -21,19 +21,19 @@ class Bunny(object):
 	def breedable(self):
 		return self.sex == "F" and self.age >= 2 and not self.radioactive
 
-	def getstats(self):
+	def get_stats(self):
 		return "{name:10}\t{age}\t{sex}\t{color:20}\t{radioactive}".format(name = self.name,
 																		age = self.age,
 																		sex = self.sex,
 																		color = self.color,
 																		radioactive = "Healthy" if not self.radioactive else "Radioactive")
 
-def makebaby(mother):
+def make_baby(mother):
 	newbaby = Bunny()
 	newbaby.color = mother.color
 	return newbaby
 
-def printgrid(board):
+def print_grid(board):
 	for i in range(10):
 		for j in range(10):
 			if not board[i][j] == 0 and not board[i][j].radioactive:
@@ -46,7 +46,7 @@ def printgrid(board):
 	print "-" * 72
 
 #Maybe use filter with function that compares  == 0
-def getemptycoords(board):
+def get_empty_coords(board):
 	emptycoord = list()
 	for i in range(10):
 		for j in range(10):
@@ -54,7 +54,7 @@ def getemptycoords(board):
 				emptycoord.append((i,j))
 	return emptycoord
 
-def getnormalbunnycoords(board):
+def get_normal_bunny_coords(board):
 	emptycoord = list()
 	for i in range(10):
 		for j in range(10):
@@ -69,7 +69,7 @@ def move((x,y), bunny, board):
 	bunny.pos = (x,y)
 	board[x][y] = bunny
 
-def find_neighbors(bunny, board, match):
+def find_neighbors(bunny, match):
 	#match is presorted list of type
 	x, y = bunny.pos
 	possiblemoves = []
@@ -99,7 +99,7 @@ def cycle(bunnies, board):
 		for bunny in bunnies[:]: #This creates a copy of bunnies, so can change bunnies in the iterations
 			bunny.age += 1
 			
-			if bunny.isdead():
+			if bunny.is_dead():
 				bunnies.remove(bunny)
 				x, y = bunny.pos
 				board[x][y] = 0
@@ -108,8 +108,8 @@ def cycle(bunnies, board):
 			if bunny.breedable():
 				male_bunnies = filter(lambda x: x.sex == "M", bunnies)
 				if male_bunnies:
-					baby = makebaby(bunny)
-					moves = find_neighbors(bunny, board, getemptycoords(board))
+					baby = make_baby(bunny)
+					moves = find_neighbors(bunny, get_empty_coords(board))
 					if moves:
 						baby.pos = random.choice(moves)
 						move(baby.pos, baby, board)
@@ -118,21 +118,21 @@ def cycle(bunnies, board):
 			if bunny.radioactive:
 				normal_bunnies = list(filter(lambda x: not x.radioactive, bunnies))
 				if normal_bunnies:
-					coords = find_neighbors(bunny, board, getnormalbunnycoords(board))
+					coords = find_neighbors(bunny, get_normal_bunny_coords(board))
 					coords = random.choice(coords)
 					for b in normal_bunnies:
 						if b.pos == coords:
 							b.radioactive = True
 
-			#print bunny.getstats()
+			#print bunny.get_stats()
 
-			if bunny.pos == (-1,-1) and len(getemptycoords(board)) != 0:
-				pos = random.choice(getemptycoords(board))
+			if bunny.pos == (-1,-1) and len(get_empty_coords(board)) != 0:
+				pos = random.choice(get_empty_coords(board))
 				move(pos, bunny, board)
 
 
 		for bunny in bunnies:
-			f.write(str(bunny.getstats()) + "\n")
+			f.write(str(bunny.get_stats()) + "\n")
 
 def main():
 	#Initialize bunny list
@@ -150,7 +150,7 @@ def main():
 			random.shuffle(bunnies)
 			bunnies = bunnies[:len(bunnies) // 2]
 
-		printgrid(board)
+		print_grid(board)
 
 if __name__ == '__main__':
 	male_names = loadfile("names_male.txt")
