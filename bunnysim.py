@@ -60,6 +60,7 @@ def getnormalbunnycoords(board):
 		for j in range(10):
 			if isinstance(board[i][j], Bunny):
 				emptycoord.append((i,j))
+
 	return emptycoord
 
 def move((x,y), bunny, board):
@@ -68,53 +69,30 @@ def move((x,y), bunny, board):
 	bunny.pos = (x,y)
 	board[x][y] = bunny
 
-def adjacent(bunny,board):
+def find_neighbors(bunny, board, match):
+	#match is presorted list of type
 	x, y = bunny.pos
-	emptycoords = getemptycoords(board)
 	possiblemoves = []
 
-	if (x+1, y) in emptycoords:
+	if (x+1, y) in match:
 		possiblemoves.append((x+1, y))
-	if (x+1, y+1) in emptycoords:
+	if (x+1, y+1) in match:
 		possiblemoves.append((x+1, y+1))
-	if (x-1, y-1) in emptycoords:
+	if (x-1, y-1) in match:
 		possiblemoves.append((x-1, y-1))
-	if (x+1, y-1) in emptycoords:
+	if (x+1, y-1) in match:
 		possiblemoves.append((x+1, y-1))
-	if (x-1, y+1) in emptycoords:
+	if (x-1, y+1) in match:
 		possiblemoves.append((x-1, y+1))
-	if (x-1, y) in emptycoords:
+	if (x-1, y) in match:
 		possiblemoves.append((x-1, y))
-	if (x, y+1) in emptycoords:
+	if (x, y+1) in match:
 		possiblemoves.append((x, y+1))
-	if (x, y-1) in emptycoords:
+	if (x, y-1) in match:
 		possiblemoves.append((x, y-1))
 
 	return possiblemoves
 
-def radioadjacent(bunny,board):
-	x, y = bunny.pos
-	emptycoords = getnormalbunnycoords(board)
-	possiblemoves = []
-
-	if (x+1, y) in emptycoords:
-		possiblemoves.append((x+1, y))
-	if (x+1, y+1) in emptycoords:
-		possiblemoves.append((x+1, y+1))
-	if (x-1, y-1) in emptycoords:
-		possiblemoves.append((x-1, y-1))
-	if (x+1, y-1) in emptycoords:
-		possiblemoves.append((x+1, y-1))
-	if (x-1, y+1) in emptycoords:
-		possiblemoves.append((x-1, y+1))
-	if (x-1, y) in emptycoords:
-		possiblemoves.append((x-1, y))
-	if (x, y+1) in emptycoords:
-		possiblemoves.append((x, y+1))
-	if (x, y-1) in emptycoords:
-		possiblemoves.append((x, y-1))
-
-	return possiblemoves
 
 def cycle(bunnies, board):
 	with open("bunnyinfo.txt", "a") as f:
@@ -131,7 +109,7 @@ def cycle(bunnies, board):
 				male_bunnies = filter(lambda x: x.sex == "M", bunnies)
 				if male_bunnies:
 					baby = makebaby(bunny)
-					moves = adjacent(bunny, board)
+					moves = find_neighbors(bunny, board, getemptycoords(board))
 					if moves:
 						baby.pos = random.choice(moves)
 						move(baby.pos, baby, board)
@@ -140,15 +118,13 @@ def cycle(bunnies, board):
 			if bunny.radioactive:
 				normal_bunnies = list(filter(lambda x: not x.radioactive, bunnies))
 				if normal_bunnies:
-					
-					coords = random.choice(radioadjacent(bunny,board))
+					coords = find_neighbors(bunny, board, getnormalbunnycoords(board))
+					coords = random.choice(coords)
 					for b in normal_bunnies:
 						if b.pos == coords:
 							b.radioactive = True
 
-							
-
-			print bunny.getstats()
+			#print bunny.getstats()
 
 			if bunny.pos == (-1,-1) and len(getemptycoords(board)) != 0:
 				pos = random.choice(getemptycoords(board))
@@ -169,7 +145,6 @@ def main():
 		f.write("")
 
 	while bunnies:
-		raw_input()
 		cycle(bunnies, board)
 		if len(bunnies) > 1000:
 			random.shuffle(bunnies)
